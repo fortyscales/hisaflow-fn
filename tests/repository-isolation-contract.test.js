@@ -1,0 +1,15 @@
+const fs=require('fs'), path=require('path'), assert=require('assert');
+const root=path.join(__dirname,'..');
+const expense=fs.readFileSync(path.join(root,'electron/domain/expenseService.js'),'utf8');
+const sales=fs.readFileSync(path.join(root,'electron/domain/salesService.js'),'utf8');
+const guard=fs.readFileSync(path.join(root,'electron/domain/commandGuard.js'),'utf8');
+const queries=fs.readFileSync(path.join(root,'electron/queries.js'),'utf8');
+for (const f of ['activityRepository.js','expenseRepository.js','operationReceiptRepository.js','orderRepository.js','saleRepository.js','index.js']) assert.ok(fs.existsSync(path.join(root,'electron/repositories',f)),f);
+assert.ok(!sales.includes('.prepare('),'sales domain must not contain SQL prepare calls');
+assert.ok(sales.includes('repositories.sales') && sales.includes('repositories.orders') && sales.includes('repositories.products'));
+assert.ok(!expense.includes('.prepare('),'expense domain must not contain SQL prepare calls');
+assert.ok(expense.includes('repositories.expenses') && expense.includes('repositories.activities'));
+assert.ok(expense.includes('transactionRunner.run'));
+assert.ok(guard.includes('repo.find(operationId)') && guard.includes('repo.save('));
+assert.ok(queries.includes('createRepositories(db)') && queries.includes('createTransactionRunner(db)'));
+console.log('v1.3 repository isolation contracts passed');

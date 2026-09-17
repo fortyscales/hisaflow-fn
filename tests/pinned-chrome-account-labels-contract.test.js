@@ -1,0 +1,15 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const chrome=read('src/components/StickyScreenChrome.jsx');
+assert(chrome.includes('top: -inset'), 'sticky chrome must compensate the padded scroll origin so its background covers the top edge');
+assert(chrome.includes('marginTop: -inset'), 'sticky chrome must cancel screen top padding');
+const header=read('src/components/ScreenHeader.jsx');
+assert(header.includes('marginTop: -inset'), 'standalone headers must extend through screen top padding');
+for(const f of ['ActivityLogScreen.jsx','StaffScreen.jsx','SuppliersScreen.jsx','ProductsScreen.jsx','CustomersScreen.jsx','CreditScreen.jsx','ordersScreen.jsx']) assert(read('src/screens/'+f).includes('StickyScreenChrome'), `${f} must keep header/search in shared pinned chrome`);
+const accounts=read('src/screens/AccountsScreen.jsx');
+assert(accounts.includes('labelReference'), 'account transaction references must use friendly labels');
+assert(!accounts.includes("<small>{x.referenceType||''}</small>"), 'raw schema reference placeholders must not be rendered');
+const tr=read('src/i18n/translations.js');
+for(const k of ['stockBatchReferenceLabel','creditSaleReferenceLabel','businessTransactionReferenceLabel']) assert(tr.includes(k), `missing localized ${k}`);
+console.log('Pinned chrome + account labels contract: PASS');

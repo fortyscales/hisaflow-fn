@@ -1,0 +1,18 @@
+const fs = require('fs');
+const assert = require('assert');
+const sync = fs.readFileSync(require.resolve('../electron/syncService'), 'utf8');
+const migrations = fs.readFileSync(require.resolve('../electron/migrations'), 'utf8');
+const main = fs.readFileSync(require.resolve('../electron/main'), 'utf8');
+const preload = fs.readFileSync(require.resolve('../electron/preload'), 'utf8');
+assert(sync.includes('protocolVersion: 1'));
+assert(sync.includes('leasePendingEvents'));
+assert(sync.includes('acknowledgeEvents'));
+assert(sync.includes('failEvents'));
+assert(sync.includes('dead_lettered_at'));
+assert(sync.includes('2 **'));
+assert(migrations.includes("version: 9"));
+assert(migrations.includes("name: 'sync-protocol-v1'"));
+assert(migrations.includes("sync_protocol_version"));
+assert(main.includes('sync:lease') && main.includes('sync:ack') && main.includes('sync:fail'));
+assert(preload.includes('leaseSyncEvents') && preload.includes('acknowledgeSyncEvents'));
+console.log('sync protocol contract: ok');

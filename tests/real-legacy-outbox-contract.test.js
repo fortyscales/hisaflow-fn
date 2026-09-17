@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const src = fs.readFileSync(path.join(__dirname, '..', 'electron', 'migrations.js'), 'utf8');
+assert(src.includes("instr(lower(sql), 'sync_outbox') > 0"), 'legacy rebuild must discover dependent outbox triggers');
+assert(src.includes('DROP TRIGGER IF EXISTS'), 'legacy rebuild must temporarily drop dependent triggers');
+assert(src.includes('db.exec(trigger.sql)'), 'legacy rebuild must restore dependent triggers');
+assert(src.includes('(event_id, entity_type, entity_id, operation, payload, created_at, attempts, last_error, synced_at)'), 'legacy copy must omit physical legacy id');
+assert(!src.includes('(id, event_id, entity_type, entity_id, operation, payload, created_at, attempts, last_error, synced_at)'), 'legacy TEXT id must never be copied into INTEGER PRIMARY KEY');
+console.log('v2.0.3 real legacy outbox contract: PASS');

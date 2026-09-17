@@ -1,0 +1,82 @@
+{
+  "name": "hisaflow-desktop",
+  "version": "2.2.10",
+  "private": true,
+  "description": "HisaFlow desktop app - offline-capable, syncs when connected",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "package": "npm run build && electron-builder",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "test:domain": "node tests/inventory-domain.test.js",
+    "test:sales": "node tests/sales-domain.test.js",
+    "test:idempotency": "node tests/sales-idempotency-contract.test.js",
+    "test:analytics": "node tests/analytics-contract.test.js",
+    "test:ledger": "node tests/inventory-ledger-contract.test.js",
+    "test:reliability": "node tests/reliability-core-contract.test.js",
+    "test:sync": "node tests/sync-protocol-contract.test.js",
+    "test:postgres-ready": "node tests/postgres-ready-contract.test.js",
+    "test:repository-contracts": "node tests/repository-isolation-contract.test.js",
+    "test:application-contracts": "node tests/application-contracts.test.js",
+    "test:legacy-surface": "node tests/legacy-surface-contract.test.js",
+    "test:failure": "node tests/failure-injection.test.js && node tests/failure-testing-contract.test.js",
+    "test:contracts": "node tests/analytics-contract.test.js && node tests/application-contracts.test.js && node tests/backup-recovery-contract.test.js && node tests/failure-testing-contract.test.js && node tests/inventory-ledger-contract.test.js && node tests/legacy-surface-contract.test.js && node tests/performance-contract.test.js && node tests/postgres-ready-contract.test.js && node tests/reliability-core-contract.test.js && node tests/repository-isolation-contract.test.js && node tests/repository-isolation-v14-contract.test.js && node tests/sales-idempotency-contract.test.js && node tests/sync-protocol-contract.test.js && node tests/production-hardening-contract.test.js && node tests/production-readiness-contract.test.js && node tests/migration-upgrade-contract.test.js && node tests/real-legacy-outbox-contract.test.js && node tests/merchant-finance-contract.test.js && node tests/b2b-invoice-contract.test.js && node tests/b2b-documents-contract.test.js && node tests/b2b-transaction-conversion-contract.test.js && node tests/b2b-paid-sale-and-register-contract.test.js && node tests/b2b-tax-discount-accounting-contract.test.js && node tests/financial-consistency-contract.test.js && node tests/financial-acceptance.test.js && node tests/real-legacy-invoice-contract.test.js && node tests/desktop-ux-accounts-contract.test.js && node tests/account-ledger-contract.test.js && node tests/accounts-statement-contract.test.js && node tests/desktop-polish-contract.test.js && node tests/pinned-chrome-account-labels-contract.test.js",
+    "test:production-hardening": "node tests/production-hardening-contract.test.js",
+    "check:syntax": "node tests/syntax-check.js",
+    "test:production-readiness": "node tests/production-readiness-contract.test.js",
+    "test:production": "npm run check:syntax && npm run test:contracts && npm run test:failure && npm run test:production-readiness && node tests/sticky-header-regression-contract.test.js && npm run build",
+    "test:migration-upgrades": "node tests/migration-upgrade-contract.test.js",
+    "test:finance": "node tests/merchant-finance-contract.test.js",
+    "test:b2b-invoices": "node tests/b2b-invoice-contract.test.js",
+    "test:tax-accounting": "node tests/b2b-tax-discount-accounting-contract.test.js",
+    "test:financial-consistency": "node tests/financial-consistency-contract.test.js",
+    "test:financial-acceptance": "node tests/financial-acceptance.test.js",
+    "test:legacy-invoices": "node tests/real-legacy-invoice-contract.test.js",
+    "test:release-candidate": "npm run check:syntax && npm run test:contracts && npm run test:failure && node tests/release-candidate-contract.test.js && npm run build",
+    "test:desktop-ux": "node tests/desktop-ux-accounts-contract.test.js",
+    "test:accounts": "node tests/account-ledger-contract.test.js",
+    "test:account-statements": "node tests/accounts-statement-contract.test.js",
+    "test:desktop-polish": "node tests/desktop-polish-contract.test.js",
+    "test:ux-localization": "node tests/ux-localization-contract.test.js",
+    "test:branding": "node tests/app-branding-contract.test.js",
+    "test:sales-product-identity": "node tests/sales-product-identity-contract.test.js"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.1.0",
+    "better-sqlite3": "^11.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.4.1",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.fortyscales.hisaflowdesktop",
+    "productName": "HisaFlow",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "icon": "build/icon.png"
+  },
+  "author": "HisaFlow"
+}

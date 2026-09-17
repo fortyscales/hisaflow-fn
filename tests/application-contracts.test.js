@@ -1,0 +1,17 @@
+'use strict';
+const assert=require('assert'); const fs=require('fs'); const path=require('path');
+const root=path.join(__dirname,'..');
+const main=fs.readFileSync(path.join(root,'electron/main.js'),'utf8');
+const preload=fs.readFileSync(path.join(root,'electron/preload.js'),'utf8');
+const data=fs.readFileSync(path.join(root,'src/services/DataService.js'),'utf8');
+const contracts=require('../electron/application/contracts');
+assert(main.includes('createApplication({ queries })'));
+assert(main.includes('"app:commandSafe"')); assert(main.includes('"app:querySafe"'));
+assert(preload.includes('command: (name, payload)')); assert(preload.includes('query: (name, payload)'));
+assert(data.includes('command("completeSale"'));
+assert(data.includes('query("dashboard"'));
+const sale=contracts.completeSaleCommand({productId:'p1',quantity:'2',sellingPrice:'1000'});
+assert.equal(sale.quantity,2); assert.equal(sale.sellingPrice,1000); assert(sale.operationId.startsWith('op_'));
+assert.throws(()=>contracts.completeSaleCommand({productId:'p1',quantity:0,sellingPrice:1000}),/INVALID_QUANTITY/);
+const page=contracts.salesPageQuery({page:-3,pageSize:999,search:'  sugar '}); assert.deepEqual(page,{page:1,pageSize:100,search:'sugar'});
+console.log('v1.5 application contracts passed');

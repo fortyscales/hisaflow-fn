@@ -1,0 +1,11 @@
+const fs=require("fs"), path=require("path"), assert=require("assert");
+const root=path.join(__dirname,"..");
+const migrations=fs.readFileSync(path.join(root,"electron/migrations.js"),"utf8");
+const queries=fs.readFileSync(path.join(root,"electron/queries.js"),"utf8");
+const preload=fs.readFileSync(path.join(root,"electron/preload.js"),"utf8");
+const modal=fs.readFileSync(path.join(root,"src/components/InvoiceModal.jsx"),"utf8");
+assert(migrations.includes("b2b-and-cash-sale-invoices"));
+for(const c of ["sale_id","invoice_kind","customer_registration_no","purchase_order_no","customer_email"]) assert(migrations.includes(c));
+assert(queries.includes("createSaleInvoiceTx")); assert(queries.includes("getInvoiceBySaleId"));
+assert(preload.includes("invoices:createForSale")); assert(modal.includes("B2B / Company invoice"));
+console.log("B2B invoice contract passed");

@@ -1,0 +1,18 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const root=path.join(__dirname,'..');
+const q=fs.readFileSync(path.join(root,'electron','queries.js'),'utf8');
+const main=fs.readFileSync(path.join(root,'electron','main.js'),'utf8');
+const preload=fs.readFileSync(path.join(root,'electron','preload.js'),'utf8');
+const app=fs.readFileSync(path.join(root,'src','App.jsx'),'utf8');
+const sidebar=fs.readFileSync(path.join(root,'src','components','SideBar.jsx'),'utf8');
+const screen=fs.readFileSync(path.join(root,'src','screens','AccountsScreen.jsx'),'utf8');
+const settings=fs.readFileSync(path.join(root,'src','components','PaymentAccountsSection.jsx'),'utf8');
+assert(q.includes('function getAccountStatement'), 'statement query missing');
+assert(q.includes("date >= @start") && q.includes("date < @end"), 'statement must use half-open date boundaries');
+assert(main.includes('accounts:statement') && preload.includes('getAccountStatement'), 'IPC statement contract missing');
+assert(app.includes('AccountsScreen') && app.includes('activeScreen === "accounts"'), 'accounts screen not routed');
+assert(sidebar.includes('navAccounts') && sidebar.includes('Landmark'), 'accounts navigation missing');
+assert(screen.includes('Account Statement') && screen.includes("exportStatement('pdf')") && screen.includes("exportStatement('xlsx')"), 'statement PDF/Excel exports missing');
+assert(screen.includes('Current balance') && screen.includes('Period money in') && screen.includes('Period money out'), 'account financial summaries missing');
+assert(settings.includes('cannot be deleted') && settings.includes('ledger?.entries'), 'accounts with ledger history must not be deletable');
+console.log('accounts statement contract: PASS');

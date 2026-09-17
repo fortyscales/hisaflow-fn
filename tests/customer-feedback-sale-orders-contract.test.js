@@ -1,0 +1,15 @@
+const fs=require('fs'); const assert=require('assert');
+const read=p=>fs.readFileSync(p,'utf8');
+const order=read('src/components/CreateOrderModal.jsx');
+assert(order.includes('ProductIdentity product={p} compact showStock'), 'Order picker must show full product identity');
+assert(order.includes('productBrand: product.brand'), 'Order must snapshot brand');
+assert(order.includes('productSize: product.size'), 'Order must snapshot size');
+const mig=read('electron/migrations.js'); assert(mig.includes("version: 21")&&mig.includes("order-item-product-identity"));
+const q=read('electron/queries.js');
+assert(q.includes('p.account_label')&&q.includes('AS account_label'), 'Paid credit history must surface payment account');
+assert(q.includes('account_label,account_number,date FROM credit_sale_payments'), 'Invoice payment history must fetch account');
+const receipt=read('src/components/PaymentReceiptModal.jsx'); assert(receipt.includes('payment.accountLabel'));
+const credit=read('src/screens/CreditScreen.jsx'); assert(credit.includes('accountLabel: account?.label'));
+const customer=read('src/components/CustomerProfilemodal.jsx'); assert(customer.includes('paymentAccounts={paymentAccounts}')&&customer.includes('accountLabel: account?.label'));
+const saleForm=read('src/components/SaleFormModal.jsx'); assert(saleForm.includes('<span>Brand:</span>{" "}<strong>')&&saleForm.includes('<span>Size:</span>{" "}<strong>'));
+console.log('customer feedback sale/orders contract: PASS');

@@ -1,0 +1,16 @@
+const fs=require('fs'), path=require('path'), assert=require('assert');
+const root=path.join(__dirname,'..');
+const migrations=fs.readFileSync(path.join(root,'electron/migrations.js'),'utf8');
+const queries=fs.readFileSync(path.join(root,'electron/queries.js'),'utf8');
+const purchase=fs.readFileSync(path.join(root,'electron/domain/purchaseService.js'),'utf8');
+const credit=fs.readFileSync(path.join(root,'electron/domain/creditService.js'),'utf8');
+const expense=fs.readFileSync(path.join(root,'electron/domain/expenseService.js'),'utf8');
+const snapshot=fs.readFileSync(path.join(root,'electron/databaseSnapshot.js'),'utf8');
+assert(migrations.includes("version: 8"));
+for(const guard of ['guard_batch_insert','guard_credit_update','guard_expense_insert','guard_supplier_payment_insert']) assert(migrations.includes(guard));
+assert(purchase.includes("purchase.completeCart") && purchase.includes('inventory.receiveStock'));
+assert(credit.includes("credit.completeSale") && credit.includes("credit.recordPayment") && credit.includes("credit.delete"));
+assert(expense.includes("expense.add") && expense.includes("expense.delete"));
+assert(snapshot.includes('db.backup(target)') && snapshot.includes("quick_check"));
+assert(queries.includes('purchaseDomain.cartTx') && queries.includes('creditDomain.completeTx') && queries.includes('expenseDomain.addTx'));
+console.log('v1.0 reliability core contract: PASS');

@@ -1,0 +1,12 @@
+const fs=require('fs');
+const assert=(v,m)=>{if(!v) throw new Error(m)};
+const q=fs.readFileSync('electron/queries.js','utf8');
+const a=fs.readFileSync('electron/repositories/analyticsRepository.js','utf8');
+const r=fs.readFileSync('src/screens/ReportsScreen.jsx','utf8');
+assert(q.includes("saleType: 'paid'") && q.includes("saleType: 'credit'"),'sales report must identify paid and credit lines');
+assert(q.includes('FROM credit_sale_items i JOIN credit_sales cs'),'reports must include credit-sale item revenue');
+assert(a.includes('FROM credit_sale_items i') && a.includes('JOIN credit_sales cs'),'dashboard must include credit-sale item revenue');
+assert(q.includes('FROM tax_ledger WHERE'),'report data must expose tax ledger');
+assert(r.includes('tax:"Tax"') && r.includes("type==='tax'"),'Reports UI must expose tax report');
+assert(r.includes("x.saleType==='credit'?'Credit':'Paid'"),'Sales export must distinguish credit from paid');
+console.log('Financial consistency contract passed');

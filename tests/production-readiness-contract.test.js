@@ -1,0 +1,11 @@
+const fs = require('fs');
+const assert = require('assert');
+const pkg = JSON.parse(fs.readFileSync('package.json','utf8'));
+assert(/^2\.(?:[0-9]+)\.\d+$/.test(pkg.version), 'expected v2.x production build');
+assert(pkg.scripts['test:contracts']);
+assert(pkg.scripts['test:failure']);
+assert(pkg.scripts['check:syntax']);
+assert(pkg.scripts['test:production']);
+const checklist = fs.readFileSync('docs/PRODUCTION_READINESS.md','utf8');
+for (const term of ['Vite production build','better-sqlite3','Electron','backup','failure-injection','Windows']) assert(checklist.includes(term), term);
+console.log('v2.0 production readiness contract: PASS');

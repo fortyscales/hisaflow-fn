@@ -1,0 +1,16 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const search=read('src/services/searchService.js');
+const picker=read('src/components/ProductPicker.jsx');
+const sale=read('src/components/SaleFormModal.jsx');
+const row=read('src/components/ProductRow.jsx');
+const card=read('src/components/SaleCard.jsx');
+const form=read('src/components/ProductFormModal.jsx');
+assert(search.includes('p.size') && search.includes('p.unit') && search.includes('tokens.every'));
+assert(picker.includes('ProductIdentity'));
+assert(sale.includes('productSummary') && sale.includes('selectedProduct.expiryDate') && sale.includes('qtyControl'));
+assert(row.includes('ProductIdentity'));
+assert(!card.includes('Transaction ·'));
+assert(form.includes('duplicateProductVariantError') && form.includes('existingProducts'));
+console.log('sales product identity / fast sale contract: PASS');

@@ -1,0 +1,17 @@
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const root = path.join(__dirname, '..');
+const migrations = fs.readFileSync(path.join(root,'electron','migrations.js'),'utf8');
+const pg = fs.readFileSync(path.join(root,'docs','postgresql-schema.sql'),'utf8');
+const contract = require(path.join(root,'shared','dataContract.js'));
+assert(migrations.includes("version: 10"));
+assert(migrations.includes("name: 'postgres-ready-tenant-model'"));
+for (const table of ['products','stock_batches','sales','credit_sales','expenditures','suppliers','staff','orders']) assert(migrations.includes(`'${table}'`));
+assert(pg.includes('shop_id uuid NOT NULL'));
+assert(pg.includes('timestamptz'));
+assert(pg.includes('numeric(18,2)'));
+assert.strictEqual(contract.DATA_MODEL_VERSION,1);
+assert.strictEqual(contract.SYNC_PROTOCOL_VERSION,1);
+contract.assertSyncEnvelope({protocolVersion:1,eventId:'evt_1234567890abcdef',entityId:'sale_1234567890abcdef',shopId:'shop_1234567890abcdef',deviceId:'device_1234567890abcdef',operation:'UPSERT',occurredAt:new Date().toISOString()});
+console.log('postgres-ready contract: PASS');

@@ -1,0 +1,21 @@
+const fs = require('fs');
+const assert = require('assert');
+const repo = fs.readFileSync('electron/repositories/analyticsRepository.js', 'utf8');
+const dashboard = fs.readFileSync('src/screens/DashboardScreen.jsx', 'utf8');
+assert(repo.includes('WITH unified_sales AS'), 'analytics should aggregate cash + credit in SQLite');
+assert(repo.includes('SUM(u.revenue)'), 'revenue should be aggregated in SQL');
+assert(repo.includes('SUM(u.profit)'), 'profit should be aggregated in SQL');
+assert(repo.includes('SUM(e.amount)'), 'expenses should be aggregated in SQL');
+assert(repo.includes('GROUP BY u.product_id'), 'rankings should be grouped in SQL');
+assert(!dashboard.includes('dataService.getSales(),'), 'dashboard must not load all sales');
+assert(!dashboard.includes('dataService.getCreditSales(),'), 'dashboard must not load all credit sales');
+assert(!dashboard.includes('dataService.getExpenditures(),'), 'dashboard must not load all expenses');
+assert(dashboard.includes('getDashboardAnalytics'), 'dashboard should request a compact SQL summary');
+console.log('analytics contract: OK');
+const staffScreen = fs.readFileSync('src/screens/StaffScreen.jsx', 'utf8');
+assert(!staffScreen.includes('dataService.getSales().then'), 'staff screen must not load all cash sales');
+assert(!staffScreen.includes('dataService.getCreditSales().then'), 'staff screen must not load all credit sales');
+assert(staffScreen.includes('getStaffSalesSummary'), 'staff performance should be aggregated by SQLite');
+
+const migrations = fs.readFileSync('electron/migrations.js', 'utf8');
+assert(migrations.includes("analytics-query-engine"), 'analytics indexes should be versioned migration');

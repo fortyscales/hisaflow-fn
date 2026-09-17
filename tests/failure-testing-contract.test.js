@@ -1,0 +1,15 @@
+const assert=require('assert'),fs=require('fs'),path=require('path');
+const root=path.join(__dirname,'..');
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));
+const test=fs.readFileSync(path.join(root,'tests/failure-injection.test.js'),'utf8');
+const integrity=fs.readFileSync(path.join(root,'electron/integrity.js'),'utf8');
+assert(/^2\.(?:[0-9]+)\.\d+$/.test(pkg.version));
+assert(pkg.scripts['test:failure']);
+assert(pkg.scripts['test:contracts']);
+assert(test.includes('INJECTED_SALE_INSERT_FAILURE'));
+assert(test.includes('INJECTED_ACTIVITY_FAILURE'));
+assert(test.includes('INJECTED_PAYMENT_INSERT_FAILURE'));
+assert(test.includes('IDEMPOTENCY_CONFLICT'));
+assert(integrity.includes('staleSyncLeases'));
+assert(integrity.includes('invalidOperationReceipts'));
+console.log('v1.8 failure-testing contracts passed');

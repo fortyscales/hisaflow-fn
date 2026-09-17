@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('assert'); const fs=require('fs'); const path=require('path');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const migrations=read('electron/migrations.js'), sales=read('electron/domain/salesService.js'), purchases=read('electron/domain/purchaseService.js'), credits=read('electron/domain/creditService.js'), expenses=read('electron/domain/expenseService.js'), queries=read('electron/queries.js');
+assert(migrations.includes("version: 17") && migrations.includes('CREATE TABLE IF NOT EXISTS account_ledger'),'migration 17 must create account ledger');
+assert(migrations.includes("'stock_purchase'") && migrations.includes("'sale'"),'migration must backfill identified historical account activity');
+for (const [name,src] of [['sales',sales],['purchases',purchases],['credits',credits],['expenses',expenses]]) assert(src.includes('accountLedger?.record'),`${name} must write account ledger inside domain transaction`);
+assert(queries.includes('function getAccountSummary()'),'account balance query required');
+assert(queries.includes("entry_type,'sale_reversal'" ) || queries.includes("'sale_reversal'"),'sale deletion must reverse account movement');
+console.log('account ledger contract: PASS');

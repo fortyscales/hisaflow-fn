@@ -1,0 +1,12 @@
+const fs = require('fs');
+const assert = require('assert');
+const q = fs.readFileSync('electron/queries.js','utf8');
+const sales = fs.readFileSync('src/screens/SalesScreen.jsx','utf8');
+const expenses = fs.readFileSync('src/screens/ExpensesScreen.jsx','utf8');
+const activity = fs.readFileSync('src/services/ActivityLogService.js','utf8');
+assert(q.includes('function getSalesPage'));
+assert(q.includes('LIMIT @limit OFFSET @offset'));
+assert(sales.includes('dataService.getSalesPage'));
+assert(!expenses.includes('dataService.saveExpenditures(updated)'));
+assert(activity.includes('dataService.appendActivityLog(entry)'));
+console.log('v0.7 performance contracts passed');
