@@ -35,8 +35,20 @@ const PERIODS = ["today", "week", "month", "quarter", "year", "all"];
 const DashboardScreen = ({ onNavigate, currentUser }) => {
   const { t } = useLanguage();
   const [products, setProducts] = useState([]);
-  const [analytics, setAnalytics] = useState({ totalRevenue: 0, totalExpenses: 0, netProfit: 0, transactionCount: 0, bestSellers: [], mostProfitable: [], maxSellerQty: 1, maxProfitAmount: 1 });
-  const [overdueSummary, setOverdueSummary] = useState({ customerCount: 0, overdueTotal: 0 });
+  const [analytics, setAnalytics] = useState({
+    totalRevenue: 0,
+    totalExpenses: 0,
+    netProfit: 0,
+    transactionCount: 0,
+    bestSellers: [],
+    mostProfitable: [],
+    maxSellerQty: 1,
+    maxProfitAmount: 1,
+  });
+  const [overdueSummary, setOverdueSummary] = useState({
+    customerCount: 0,
+    overdueTotal: 0,
+  });
   const [orders, setOrders] = useState([]);
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
@@ -60,9 +72,11 @@ const DashboardScreen = ({ onNavigate, currentUser }) => {
     if (selectedPeriod === "all") return { start: null, end: null };
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    if (selectedPeriod === "week") start.setDate(start.getDate() - start.getDay());
+    if (selectedPeriod === "week")
+      start.setDate(start.getDate() - start.getDay());
     else if (selectedPeriod === "month") start.setDate(1);
-    else if (selectedPeriod === "quarter") start.setMonth(Math.floor(start.getMonth() / 3) * 3, 1);
+    else if (selectedPeriod === "quarter")
+      start.setMonth(Math.floor(start.getMonth() / 3) * 3, 1);
     else if (selectedPeriod === "year") start.setMonth(0, 1);
     return { start: start.toISOString(), end: null };
   };
@@ -85,13 +99,18 @@ const DashboardScreen = ({ onNavigate, currentUser }) => {
       dataService.getProducts(),
       dataService.getSettings(),
       orderService.getOrders(),
-      dataService.getOverdueReceivablesSummary({ cutoff: overdueCutoff.toISOString() }),
+      dataService.getOverdueReceivablesSummary({
+        cutoff: overdueCutoff.toISOString(),
+      }),
       loadAnalytics(period),
     ]).then(([p, set, o, overdue]) => {
       setProducts(p);
       setSettings(set);
       setOrders(o);
-      setOverdueSummary({ customerCount: overdue.customer_count || 0, overdueTotal: overdue.overdue_total || 0 });
+      setOverdueSummary({
+        customerCount: overdue.customer_count || 0,
+        overdueTotal: overdue.overdue_total || 0,
+      });
 
       const stockAlerts = alertService.getLowStockAlerts(p);
       const expiryAlerts = alertService.getExpiryAlerts(p);
@@ -265,10 +284,9 @@ const DashboardScreen = ({ onNavigate, currentUser }) => {
         </div>
       )}
 
-      {products.length === 0 && sales.length === 0 && (
+      {products.length === 0 && transactionCount === 0 && (
         <div style={styles.emptyNote}>{t("noDataYet")}</div>
       )}
-
       <div style={styles.periodRow}>
         {PERIODS.map((p) => (
           <button
@@ -569,5 +587,3 @@ const styles = {
 };
 
 export default DashboardScreen;
-
-
